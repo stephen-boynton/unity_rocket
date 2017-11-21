@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Rocket : MonoBehaviour {
-
+    
+    [SerializeField]float rcsThrust = 150f;
+    [SerializeField] float mainThrust = 10f;
     Rigidbody rigidbody;
     AudioSource audio;
 
@@ -18,32 +17,57 @@ public class Rocket : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
     {
-        ProcessUpdate();
+        Thrust();
+        Rotation();
 	}
 
-    private void ProcessUpdate()
+    void OnCollisionEnter(Collision collision)
     {
-        if(Input.GetKey(KeyCode.Space))
+        switch(collision.gameObject.tag) 
         {
-            rigidbody.AddRelativeForce(Vector3.up);
+            case "Friendly":
+                print("Okay.");
+                break;
+            default:
+                print("Dead.");
+                break;
+        }
+    }
 
-            if(!audio.isPlaying)
+    private void Thrust()
+    {
+        if (Input.GetKey(KeyCode.Space))
+        {
+            rigidbody.AddRelativeForce(Vector3.up * mainThrust);
+
+            if (!audio.isPlaying)
             {
-               audio.Play();
+                audio.Play();
             }
         }
-        else 
+        else
         {
             audio.Stop();
         }
+    }
+
+    private void Rotation()
+    {
+        float rotationThisFrame = rcsThrust * Time.deltaTime;
+
+        rigidbody.freezeRotation = true; //take manual control of roatation
 
         if (Input.GetKey(KeyCode.A))
         {
-            transform.Rotate(Vector3.forward);
+            transform.Rotate(Vector3.forward * rotationThisFrame);
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            transform.Rotate(Vector3.back);
+            transform.Rotate(Vector3.back * rotationThisFrame);
         }
+
+        rigidbody.freezeRotation = false; // let physics do its work
     }
+
+
 }

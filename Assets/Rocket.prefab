@@ -121,7 +121,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1086589806183494}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.72, z: 0}
+  m_LocalPosition: {x: -26.22, y: 12.99, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4140496722287102}
@@ -252,7 +252,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: c59567c18542a490ca96e2d5d54819c9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -394,7 +394,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: b979e0de520c74e02912c61785c3f460, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 0.1
   m_Pitch: 0.5
@@ -478,6 +478,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rcsThrust: 150
   mainThrust: 20
+  loadTime: 3
+  mainEngine: {fileID: 8300000, guid: bf1017d713ce648ec9ca0f31c5247264, type: 3}
+  explosion: {fileID: 8300000, guid: 54f3f48645d83462c99a249099a1aac1, type: 3}
+  levelComplete: {fileID: 8300000, guid: 8006d9c53d32d464980520a7b12f563b, type: 3}
 --- !u!135 &135364164562803424
 SphereCollider:
   m_ObjectHideFlags: 1

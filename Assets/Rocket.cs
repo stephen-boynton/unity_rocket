@@ -12,12 +12,15 @@ public class Rocket : MonoBehaviour {
     [SerializeField] AudioClip explosion;
     [SerializeField] AudioClip levelComplete;
 
+    [SerializeField] Light flame;
+
     [SerializeField] ParticleSystem thrustParticles;
     [SerializeField] ParticleSystem explosionParticles;
     [SerializeField] ParticleSystem successParticles;
 
     Rigidbody rigidbody;
     AudioSource audio;
+    bool canCollideDebug = true;
 
     enum State 
     {
@@ -31,6 +34,8 @@ public class Rocket : MonoBehaviour {
     {
         rigidbody = GetComponent<Rigidbody>();
         audio = GetComponent<AudioSource>();
+        flame = GetComponent<Light>();
+        flame.enabled = false;
 	}
 	
 	// Update is called once per frame
@@ -40,8 +45,17 @@ public class Rocket : MonoBehaviour {
         {
             RespondToThrust();
             RespondToRotation();
+            debugCollision();
+            debugLevelLoad();
         }
 	}
+
+    private void debugLevelLoad()
+    {
+        if(Input.GetKeyDown(KeyCode.L)){
+            LoadNextScene();
+        }
+    }
 
     void OnCollisionEnter(Collision collision)
     {
@@ -60,14 +74,22 @@ public class Rocket : MonoBehaviour {
                 Invoke("LoadNextScene", loadTime);
                 break;
             default:
-                state = State.Dying;
-                audio.Stop();
-                thrustParticles.Stop();
-                audio.PlayOneShot(explosion);
-                explosionParticles.Play();
-                print("Dead.");
-                Invoke("restartGame", loadTime);
+                if(canCollideDebug) {
+                    state = State.Dying;
+                    audio.Stop();
+                    thrustParticles.Stop();
+                    audio.PlayOneShot(explosion);
+                    explosionParticles.Play();
+                    print("Dead.");
+                    Invoke("restartGame", loadTime);
+                }
                 break;
+        }
+    }
+
+    private void debugCollision() {
+        if(Input.GetKeyDown(KeyCode.C)) {
+            canCollideDebug = !canCollideDebug;
         }
     }
 
@@ -80,6 +102,7 @@ public class Rocket : MonoBehaviour {
     {
         SceneManager.LoadScene(0);
     }
+
     private void RespondToThrust()
     {
         if (Input.GetKey(KeyCode.Space))
@@ -90,6 +113,7 @@ public class Rocket : MonoBehaviour {
         {
             audio.Stop();
             thrustParticles.Stop();
+            flame.enabled = false;
         }
     }
 
@@ -102,6 +126,7 @@ public class Rocket : MonoBehaviour {
             audio.PlayOneShot(mainEngine);
         }
         thrustParticles.Play();
+        flame.enabled = true;
     }
 
     private void RespondToRotation()

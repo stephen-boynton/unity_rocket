@@ -45,17 +45,13 @@ public class Rocket : MonoBehaviour {
         {
             RespondToThrust();
             RespondToRotation();
-            debugCollision();
-            debugLevelLoad();
+        }
+
+        if (Debug.isDebugBuild) {
+            RespondToDebugKeys();
         }
 	}
 
-    private void debugLevelLoad()
-    {
-        if(Input.GetKeyDown(KeyCode.L)){
-            LoadNextScene();
-        }
-    }
 
     void OnCollisionEnter(Collision collision)
     {
@@ -67,35 +63,59 @@ public class Rocket : MonoBehaviour {
                 print("Okay.");
                 break;
             case "Finish":
-                state = State.Transcending;
-                audio.PlayOneShot(levelComplete);
-                successParticles.Play();
-                print("Done!");
-                Invoke("LoadNextScene", loadTime);
+                StartLevelTransition();
                 break;
             default:
-                if(canCollideDebug) {
-                    state = State.Dying;
-                    audio.Stop();
-                    thrustParticles.Stop();
-                    audio.PlayOneShot(explosion);
-                    explosionParticles.Play();
-                    print("Dead.");
-                    Invoke("restartGame", loadTime);
+                if(canCollideDebug)
+                {
+                    StartDeathTransition();
                 }
                 break;
         }
     }
 
-    private void debugCollision() {
-        if(Input.GetKeyDown(KeyCode.C)) {
+    private void StartDeathTransition()
+    {
+        state = State.Dying;
+        audio.Stop();
+        thrustParticles.Stop();
+        audio.PlayOneShot(explosion);
+        explosionParticles.Play();
+        print("Dead.");
+        Invoke("restartGame", loadTime);
+    }
+
+    private void StartLevelTransition()
+    {
+        state = State.Transcending;
+        audio.PlayOneShot(levelComplete);
+        successParticles.Play();
+        print("Done!");
+        Invoke("LoadNextScene", loadTime);
+    }
+
+    private void RespondToDebugKeys()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
             canCollideDebug = !canCollideDebug;
+        } 
+        else if (Input.GetKeyDown(KeyCode.L))
+        {
+            LoadNextScene();
         }
     }
 
     private void LoadNextScene()
     {
-        SceneManager.LoadScene(1);
+        int currentScene = SceneManager.GetActiveScene().buildIndex;
+        int nextScene = currentScene + 1;
+        if(nextScene >= SceneManager.sceneCountInBuildSettings) {
+            SceneManager.LoadScene(0);
+        } else {
+            SceneManager.LoadScene(nextScene);
+        }
+
     }
 
     private void restartGame() 
@@ -111,10 +131,15 @@ public class Rocket : MonoBehaviour {
         }
         else
         {
-            audio.Stop();
-            thrustParticles.Stop();
-            flame.enabled = false;
+            StopApplyingThrust();
         }
+    }
+
+    private void StopApplyingThrust()
+    {
+        audio.Stop();
+        thrustParticles.Stop();
+        flame.enabled = false;
     }
 
     private void ApplyThrust()
@@ -133,7 +158,7 @@ public class Rocket : MonoBehaviour {
     {
         float rotationThisFrame = rcsThrust * Time.deltaTime;
 
-        rigidbody.freezeRotation = true; //take manual control of roatation
+        rigidbody.angularVelocity = Vector3.zero; //remove physics rotation;
 
         if (Input.GetKey(KeyCode.A))
         {
@@ -144,7 +169,6 @@ public class Rocket : MonoBehaviour {
             transform.Rotate(Vector3.back * rotationThisFrame);
         }
 
-        rigidbody.freezeRotation = false; // let physics do its work
     }
 
 
